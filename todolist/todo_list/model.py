@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import (
     create_engine, Column, String, Integer, Date)
@@ -23,25 +23,44 @@ class Task(Base):
         return self.task
 
 
-class Tasks:
-    def __init__(self, tasks):
-        self._tasks_iterator = iter(tasks)
+class Weekdays:
+    def __init__(self):
+        today = datetime.today()
+        self._weekdays = (today + timedelta(days=day_offset)
+                          for day_offset in range(7))
 
     def next(self):
         try:
-            task = next(self._tasks_iterator)
+            weekday_date = next(self._weekdays)
         except StopIteration:
-            task = None
-        return task
+            return None
+        weekday_info = {
+            'date': weekday_date,
+            'tasks': tasks_get_by_date(weekday_date)
+        }
+        return weekday_info
 
 
 def init_db():
     Base.metadata.create_all(engine)
 
 
+def tasks_get_by_date(date):
+    session = Session()
+    tasks = session.query(Task).\
+        filter(Task.deadline == date.strftime("%Y-%m-%d")).all()
+    if len(tasks) == 0:
+        return None
+    return tasks
+
+
+def tasks_get_today():
+    return tasks_get_by_date(datetime.today())
+
+
 def tasks_get_all():
     session = Session()
-    tasks = session.query(Task).all()
+    tasks = session.query(Task).order_by(Task.deadline).all()
     if len(tasks) == 0:
         return None
     return tasks
