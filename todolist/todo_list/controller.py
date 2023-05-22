@@ -22,16 +22,17 @@ def controller(command):
             # 1. Print all tasks
             next_command = ["menu", "tasks", "all"]
         case ["menu_choice", "main", "4"]:
+            # 2. Enter tasks_missed menu
+            next_command = ["menu", "tasks", "missed"]
+        case ["menu_choice", "main", "5"]:
             # 2. Enter task_add menu
             next_command = ["menu", "task_add"]
+        case ["menu_choice", "main", "6"]:
+            # 2. Enter task_delete menu
+            next_command = ["menu", "task_delete"]
         case ["menu_choice", "main", "0"]:
             # 0. Exit
             next_command = ["exit"]
-
-        # task_add menu
-        case ["menu", "task_add"]:
-            view.task_add()
-            next_command = ["menu", "main"]
 
         # today's tasks menu
         case ["menu", "tasks", "today"]:
@@ -73,6 +74,39 @@ def controller(command):
         case ["menu", "tasks", "all", tasks]:
             view.print_separator_line()
             view.print_tasks_all(tasks)
+            view.print_separator_line()
+            next_command = ["menu", "main"]
+
+        # missed tasks menu
+        case ["menu", "tasks", "missed"]:
+            tasks = model.tasks_get_missed()
+            next_command = ["menu", "tasks", "missed", tasks]
+        # Handle no tasks
+        case ["menu", "tasks", "missed", None]:
+            view.print_all_tasks_done()
+            next_command = ["menu", "main"]
+        case ["menu", "tasks", "missed", tasks]:
+            view.print_separator_line()
+            view.print_tasks_missed(tasks)
+            view.print_separator_line()
+            next_command = ["menu", "main"]
+
+        # task_add menu
+        case ["menu", "task_add"]:
+            view.task_add()
+            next_command = ["menu", "main"]
+
+        # task_delete menu
+        case ["menu", "task_delete"]:
+            tasks = model.tasks_get_all()
+            next_command = ["menu", "task_delete", tasks]
+        # Handle no tasks
+        case ["menu", "task_delete", None]:
+            view.print_no_tasks()
+            next_command = ["menu", "main"]
+        case ["menu", "task_delete", tasks]:
+            view.print_separator_line()
+            view.task_delete(tasks)
             view.print_separator_line()
             next_command = ["menu", "main"]
 

@@ -70,9 +70,37 @@ def print_tasks_all(tasks):
     print_message(msg.INFO_TASKS_ALL)
     for task in tasks:
         print_message(
-            msg.INFO_TASK_ENTRY_WITH_DATE.substitute(
+            msg.INFO_TASK_ENTRY_WITH_DATE_NO_INDEX.substitute(
                 task=task.task,
                 date=task.deadline.strftime('%d %b')))
+
+
+def print_all_tasks_done():
+    print_message(msg.INFO_TASKS_ALL_DONE)
+
+
+def print_tasks_missed(tasks):
+    print_message(msg.INFO_TASKS_MISSED)
+    for menu_index, task in zip(itertools.count(1), tasks):
+        print_message(
+            msg.INFO_TASK_ENTRY_WITH_DATE.substitute(
+                menu_index=menu_index, task=task.task,
+                date=task.deadline.strftime('%d %b')))
+
+
+# delete task
+def task_delete(tasks):
+    print_message(msg.PROMPT_DELETE_TASK)
+    indexed_tasks = dict(zip(itertools.count(1), tasks))
+    for menu_index, task in indexed_tasks.items():
+        print_message(
+            msg.INFO_TASK_ENTRY_WITH_DATE.substitute(
+                menu_index=menu_index, task=task.task,
+                date=task.deadline.strftime('%d %b')))
+    choice_index = int(input())
+    model.task_delete(indexed_tasks[choice_index])
+    print_message(msg.INFO_TASK_DELETED)
+
 
 
 # exit

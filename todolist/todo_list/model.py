@@ -61,13 +61,30 @@ def tasks_get_today():
 def tasks_get_all():
     session = Session()
     tasks = session.query(Task).order_by(Task.deadline).all()
+    session.close()
     if len(tasks) == 0:
         return None
     return tasks
+
+
+def tasks_get_missed():
+    session = Session()
+    tasks = session.query(Task).\
+        filter(Task.deadline < datetime.today().date()).all()
+    if len(tasks) == 0:
+        return None
+    return tasks
+
 
 
 def task_create(task_data):
     session = Session()
     _task = Task(**task_data)
     session.add(_task)
+    session.commit()
+
+
+def task_delete(task):
+    session = Session()
+    session.delete(task)
     session.commit()
